@@ -343,6 +343,7 @@ class MainWindow(QMainWindow):
 
         self._browser.request_refresh.connect(self._refresh_files)
         self._browser.request_upload.connect(self._on_upload)
+        self._browser.request_drop_upload.connect(self._on_drop_upload)
         self._browser.request_edit_file.connect(self._on_edit_file)
         self._browser.request_delete_files.connect(self._on_delete_files)
         self._browser.request_download_file.connect(self._on_download_file)
@@ -816,6 +817,82 @@ class MainWindow(QMainWindow):
         def on_success(_result):
             self._progress.hide()
             self._status.showMessage("Upload complete.", 5000)
+            self._refresh_files()
+
+        def on_error(msg):
+            self._progress.hide()
+            QMessageBox.critical(self, "Upload failed", msg)
+            self._refresh_files()
+
+        self._run_api(do_upload, on_success=on_success, on_error=on_error, status_msg="Uploading...")
+
+    def _on_drop_upload(self, file_paths: list[str], target_folder: str) -> None:
+        if not self._current_repo_id or not file_paths:
+            return
+
+        file_names = [Path(p).name for p in file_paths]
+        if target_folder:
+            display_path = target_folder + "/"
+        else:
+            display_path = "(repo root)"
+
+        file_list = "\n".join(file_names[:15])
+        if len(file_names) > 15:
+            file_list += f"\n... and {len(file_names) - 15} more"
+
+        reply = QMessageBox.question(
+            self,
+            "Upload Dropped Files",
+            f"Upload {len(file_names)} file(s) to '{self._current_repo_id}'?\n\n"
+            f"Destination: {display_path}\n\n"
+            f"{file_list}",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,
+        )
+        if reply != QMessageBox.Yes:
+            return
+
+        repo_id = self._current_repo_id
+        repo_type = self._current_repo_type
+        branch = self._browser.get_current_branch() or "main"
+
+        local_paths = []
+        repo_paths = []
+        for fpath in file_paths:
+            fname = Path(fpath).name
+            if target_folder:
+                target = f"{target_folder}/{fname}"
+            else:
+                target = fname
+            local_paths.append(fpath)
+            repo_paths.append(target)
+
+        def do_upload():
+            if len(local_paths) == 1:
+                upload_file(
+                    repo_id=repo_id,
+                    local_path=local_paths[0],
+                    path_in_repo=repo_paths[0],
+                    repo_type=repo_type,
+                    commit_message=f"Upload {file_names[0]}",
+                    revision=branch,
+                )
+            else:
+                upload_files(
+                    repo_id=repo_id,
+                    local_paths=local_paths,
+                    paths_in_repo=repo_paths,
+                    repo_type=repo_type,
+                    commit_message=f"Upload {len(local_paths)} files",
+                    revision=branch,
+                )
+
+        self._progress.setRange(0, 0)
+        self._progress.show()
+
+        def on_success(_result):
+            self._progress.hide()
+            self._status.showMessage(f"Uploaded {len(local_paths)} file(s).", 5000)
             self._refresh_files()
 
         def on_error(msg):

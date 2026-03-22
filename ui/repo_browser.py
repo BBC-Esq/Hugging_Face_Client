@@ -1,6 +1,7 @@
 from __future__ import annotations
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QAction, QFont, QColor
+from pathlib import Path
+from PySide6.QtCore import Qt, Signal, QMimeData
+from PySide6.QtGui import QAction, QFont, QColor, QDragEnterEvent, QDropEvent
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -19,7 +20,62 @@ from hf_backend.hf_repos import RepoFileEntry
 from ui.styles import TOOLBAR_BUTTON_STYLE, PRIMARY_BUTTON_STYLE
 
 _SIZE_ROLE = Qt.UserRole + 1
+_FOLDER_PATH_ROLE = Qt.UserRole + 2
 _MAX_EDIT_BYTES = 10 * 1024 * 1024
+
+
+class _DropTreeWidget(QTreeWidget):
+
+    files_dropped = Signal(list, str)
+
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent)
+        self.setAcceptDrops(True)
+        self._drop_enabled = True
+
+    def set_drop_enabled(self, enabled: bool) -> None:
+        self._drop_enabled = enabled
+
+    def dragEnterEvent(self, event: QDragEnterEvent) -> None:
+        if self._drop_enabled and event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event) -> None:
+        if self._drop_enabled and event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event: QDropEvent) -> None:
+        if not self._drop_enabled or not event.mimeData().hasUrls():
+            event.ignore()
+            return
+
+        file_paths = []
+        for url in event.mimeData().urls():
+            local = url.toLocalFile()
+            if local:
+                file_paths.append(local)
+
+        if not file_paths:
+            event.ignore()
+            return
+
+        target_folder = ""
+        item = self.itemAt(event.position().toPoint())
+        if item:
+            folder_path = item.data(0, _FOLDER_PATH_ROLE)
+            if folder_path:
+                target_folder = folder_path
+            else:
+                rfilename = item.data(0, Qt.UserRole)
+                if rfilename and "/" in rfilename:
+                    target_folder = rfilename.rsplit("/", 1)[0]
+
+        event.acceptProposedAction()
+        self.files_dropped.emit(file_paths, target_folder)
 
 
 def _human_size(size: int) -> str:
@@ -40,6 +96,7 @@ class RepoBrowser(QWidget):
     request_delete_files = Signal(list)
     request_download_file = Signal(str)
     request_upload = Signal()
+    request_drop_upload = Signal(list, str)
     request_refresh = Signal()
     branch_changed = Signal(str)
 
@@ -71,7 +128,7 @@ class RepoBrowser(QWidget):
 
         layout.addLayout(toolbar)
 
-        self._tree = QTreeWidget()
+        self._tree = _DropTreeWidget()
         self._tree.setHeaderLabels(["Name", "Size", "LFS", "Blob ID"])
         self._tree.setRootIsDecorated(True)
         self._tree.setSortingEnabled(True)
@@ -91,6 +148,7 @@ class RepoBrowser(QWidget):
         self._btn_upload.clicked.connect(self.request_upload.emit)
         self._tree.customContextMenuRequested.connect(self._on_context_menu)
         self._tree.itemDoubleClicked.connect(self._on_double_click)
+        self._tree.files_dropped.connect(self.request_drop_upload.emit)
         self._branch_combo.currentTextChanged.connect(self._on_branch_changed)
         self._actions_enabled = True
 
@@ -99,6 +157,7 @@ class RepoBrowser(QWidget):
         self._btn_refresh.setEnabled(enabled)
         self._btn_upload.setEnabled(enabled)
         self._branch_combo.setEnabled(enabled)
+        self._tree.set_drop_enabled(enabled)
 
     def _on_branch_changed(self, text: str) -> None:
         if text:
@@ -163,6 +222,7 @@ class RepoBrowser(QWidget):
         if len(parts) == 1:
             item = QTreeWidgetItem([folder_path, "", "", ""])
             item.setData(0, Qt.UserRole, None)
+            item.setData(0, _FOLDER_PATH_ROLE, folder_path)
             font = item.font(0)
             font.setBold(True)
             item.setFont(0, font)
@@ -174,6 +234,7 @@ class RepoBrowser(QWidget):
         parent = self._get_or_create_folder(cache, parent_path)
         item = QTreeWidgetItem([parts[-1], "", "", ""])
         item.setData(0, Qt.UserRole, None)
+        item.setData(0, _FOLDER_PATH_ROLE, folder_path)
         font = item.font(0)
         font.setBold(True)
         item.setFont(0, font)
