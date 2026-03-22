@@ -54,6 +54,7 @@ from hf_backend.hf_repos import (
 )
 from hf_backend.hf_files import (
     upload_file,
+    upload_files,
     upload_folder,
     download_file,
     delete_files,
@@ -738,7 +739,25 @@ class MainWindow(QMainWindow):
                     commit_message=details["commit_message"],
                     revision=details["revision"],
                 )
+            elif len(details["file_paths"]) == 1:
+                fpath = details["file_paths"][0]
+                fname = Path(fpath).name
+                path_in_repo = details["path_in_repo"]
+                if path_in_repo and path_in_repo != ".":
+                    target = f"{path_in_repo.rstrip('/')}/{fname}"
+                else:
+                    target = fname
+                upload_file(
+                    repo_id=repo_id,
+                    local_path=fpath,
+                    path_in_repo=target,
+                    repo_type=repo_type,
+                    commit_message=details["commit_message"],
+                    revision=details["revision"],
+                )
             else:
+                local_paths = []
+                repo_paths = []
                 for fpath in details["file_paths"]:
                     fname = Path(fpath).name
                     path_in_repo = details["path_in_repo"]
@@ -746,14 +765,16 @@ class MainWindow(QMainWindow):
                         target = f"{path_in_repo.rstrip('/')}/{fname}"
                     else:
                         target = fname
-                    upload_file(
-                        repo_id=repo_id,
-                        local_path=fpath,
-                        path_in_repo=target,
-                        repo_type=repo_type,
-                        commit_message=details["commit_message"],
-                        revision=details["revision"],
-                    )
+                    local_paths.append(fpath)
+                    repo_paths.append(target)
+                upload_files(
+                    repo_id=repo_id,
+                    local_paths=local_paths,
+                    paths_in_repo=repo_paths,
+                    repo_type=repo_type,
+                    commit_message=details["commit_message"],
+                    revision=details["revision"],
+                )
 
         self._progress.setRange(0, 0)
         self._progress.show()

@@ -1,0 +1,17 @@
+# Virtual environment
+Lib/
+Scripts/
+Include/
+pyvenv.cfg
+
+# Python bytecode
+__pycache__/
+
+# Runtime logs
+logs/
+
+# Local model card templates
+model_cards/
+
+# Misc
+.lock

@@ -124,6 +124,36 @@ def delete_file(
         raise HFFileError(f"Failed to delete file: {e}") from e
 
 
+def upload_files(
+    repo_id: str,
+    local_paths: list[str],
+    paths_in_repo: list[str],
+    repo_type: str = "model",
+    commit_message: str = "Upload files",
+    revision: str = "main",
+) -> str:
+
+    api = get_api()
+    try:
+        from huggingface_hub import CommitOperationAdd
+        operations = [
+            CommitOperationAdd(path_in_repo=p_repo, path_or_fileobj=p_local)
+            for p_local, p_repo in zip(local_paths, paths_in_repo)
+        ]
+        result = with_retry(
+            api.create_commit,
+            repo_id=repo_id,
+            repo_type=repo_type,
+            operations=operations,
+            commit_message=commit_message,
+            revision=revision,
+        )
+        return str(result)
+    except Exception as e:
+        logger.error("Failed to upload files to %s: %s", repo_id, e)
+        raise HFFileError(f"Failed to upload files: {e}") from e
+
+
 def delete_files(
     repo_id: str,
     paths_in_repo: list[str],
