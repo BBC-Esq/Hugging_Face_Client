@@ -35,9 +35,9 @@ class CollectionManager(QWidget):
         self.setLayout(layout)
 
         toolbar = QHBoxLayout()
-        self._btn_refresh = QPushButton("⟳  Refresh")
+        self._btn_refresh = QPushButton("🔄  Refresh")
         self._btn_refresh.setStyleSheet(TOOLBAR_BUTTON_STYLE)
-        self._btn_create = QPushButton("+  New Collection")
+        self._btn_create = QPushButton("➕  New Collection")
         self._btn_create.setStyleSheet(PRIMARY_BUTTON_STYLE)
         toolbar.addWidget(self._btn_refresh)
         toolbar.addWidget(self._btn_create)

@@ -219,12 +219,12 @@ class MainWindow(QMainWindow):
         self._search_input.setClearButtonEnabled(True)
         repo_toolbar.addWidget(self._search_input, 1)
 
-        self._btn_refresh_repos = QPushButton("⟳")
+        self._btn_refresh_repos = QPushButton("🔄")
         self._btn_refresh_repos.setToolTip("Refresh repo list")
         self._btn_refresh_repos.setStyleSheet(ICON_BUTTON_STYLE)
         repo_toolbar.addWidget(self._btn_refresh_repos)
 
-        self._btn_create_repo = QPushButton("+")
+        self._btn_create_repo = QPushButton("➕")
         self._btn_create_repo.setToolTip("Create new repo")
         self._btn_create_repo.setStyleSheet(ICON_BUTTON_STYLE)
         repo_toolbar.addWidget(self._btn_create_repo)

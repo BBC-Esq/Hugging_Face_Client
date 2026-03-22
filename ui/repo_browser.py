@@ -58,7 +58,7 @@ class RepoBrowser(QWidget):
         toolbar.addWidget(QLabel("Branch:"))
         toolbar.addWidget(self._branch_combo)
 
-        self._btn_refresh = QPushButton("⟳  Refresh")
+        self._btn_refresh = QPushButton("🔄  Refresh")
         self._btn_refresh.setStyleSheet(TOOLBAR_BUTTON_STYLE)
         self._btn_upload = QPushButton("⬆  Upload")
         self._btn_upload.setStyleSheet(PRIMARY_BUTTON_STYLE)

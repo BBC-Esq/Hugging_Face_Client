@@ -2,11 +2,11 @@ from __future__ import annotations
 
 ICON_BUTTON_STYLE = """
     QPushButton {
-        font-size: 15px;
-        min-width: 32px;
-        max-width: 32px;
-        min-height: 28px;
-        max-height: 28px;
+        font-size: 14px;
+        min-width: 34px;
+        max-width: 34px;
+        min-height: 30px;
+        max-height: 30px;
         border: 1px solid palette(mid);
         border-radius: 4px;
         padding: 0px;
