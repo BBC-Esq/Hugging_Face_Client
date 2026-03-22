@@ -6,7 +6,6 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QTreeWidget,
     QTreeWidgetItem,
-    QHeaderView,
     QPushButton,
     QLabel,
     QMessageBox,
@@ -15,6 +14,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QAction
 
 from hf_backend.hf_collections import CollectionInfo
+from ui.column_sizer import ProportionalColumnSizer
 from ui.styles import TOOLBAR_BUTTON_STYLE, PRIMARY_BUTTON_STYLE
 
 
@@ -52,10 +52,7 @@ class CollectionManager(QWidget):
         self._tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self._tree.setSelectionMode(QTreeWidget.SingleSelection)
 
-        header = self._tree.header()
-        header.setStretchLastSection(True)
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self._sizer = ProportionalColumnSizer(self._tree)
 
         layout.addWidget(self._tree, 1)
 
@@ -98,6 +95,8 @@ class CollectionManager(QWidget):
 
             self._tree.addTopLevelItem(coll_item)
 
+        self._tree.expandAll()
+        self._sizer.recalculate()
         self._info_label.setText(f"{len(collections)} collections")
         self._tree.expandAll()
 

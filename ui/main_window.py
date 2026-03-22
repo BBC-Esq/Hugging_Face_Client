@@ -18,7 +18,6 @@ from PySide6.QtWidgets import (
     QSplitter,
     QTreeWidget,
     QTreeWidgetItem,
-    QHeaderView,
     QFileDialog,
     QDialog,
     QStatusBar,
@@ -35,6 +34,7 @@ from ui.styles import (
     DANGER_BUTTON_STYLE,
     TOOLBAR_BUTTON_STYLE,
 )
+from ui.column_sizer import ProportionalColumnSizer
 from ui.repo_browser import RepoBrowser
 from ui.collection_manager import CollectionManager
 from ui.workers import ApiWorker
@@ -241,16 +241,7 @@ class MainWindow(QMainWindow):
         self._repo_tree.setSelectionMode(QTreeWidget.SingleSelection)
         self._repo_tree.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        header = self._repo_tree.header()
-        header.setStretchLastSection(False)
-        for i in range(6):
-            header.setSectionResizeMode(i, QHeaderView.Interactive)
-        header.resizeSection(0, 30)
-        header.resizeSection(1, 300)
-        header.resizeSection(2, 80)
-        header.resizeSection(3, 90)
-        header.resizeSection(4, 70)
-        header.resizeSection(5, 150)
+        self._repo_sizer = ProportionalColumnSizer(self._repo_tree)
 
         left_layout.addWidget(self._repo_tree, 1)
 
@@ -506,6 +497,7 @@ class MainWindow(QMainWindow):
             item.setData(0, Qt.UserRole, r)
             self._repo_tree.addTopLevelItem(item)
             shown += 1
+        self._repo_sizer.recalculate()
         total = len(self._all_repos)
         if search_text or favs_only:
             self._status.showMessage(f"Showing {shown} of {total} repos.", 3000)

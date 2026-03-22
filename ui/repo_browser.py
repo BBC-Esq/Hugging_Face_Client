@@ -8,7 +8,6 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QTreeWidget,
     QTreeWidgetItem,
-    QHeaderView,
     QMenu,
     QPushButton,
     QLabel,
@@ -17,6 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 from hf_backend.hf_repos import RepoFileEntry
+from ui.column_sizer import ProportionalColumnSizer
 from ui.styles import TOOLBAR_BUTTON_STYLE, PRIMARY_BUTTON_STYLE
 
 _SIZE_ROLE = Qt.UserRole + 1
@@ -135,12 +135,7 @@ class RepoBrowser(QWidget):
         self._tree.setSelectionMode(QTreeWidget.ExtendedSelection)
         self._tree.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        header = self._tree.header()
-        header.setStretchLastSection(False)
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self._sizer = ProportionalColumnSizer(self._tree)
 
         layout.addWidget(self._tree, 1)
 
@@ -211,6 +206,7 @@ class RepoBrowser(QWidget):
 
         self._info_label.setText(f"{len(entries)} files · {_human_size(total_size)} total")
         self._tree.expandAll()
+        self._sizer.recalculate()
 
     def _get_or_create_folder(
         self, cache: dict[str, QTreeWidgetItem], folder_path: str
