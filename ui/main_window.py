@@ -2,7 +2,7 @@ from __future__ import annotations
 import webbrowser
 from pathlib import Path
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (
     QMainWindow,
     QWidget,
@@ -102,6 +102,11 @@ class MainWindow(QMainWindow):
         self._busy: bool = False
         self._all_repos: list[RepoInfo] = []
         self._favorites: set[str] = set()
+
+        self._search_timer = QTimer()
+        self._search_timer.setSingleShot(True)
+        self._search_timer.setInterval(700)
+        self._search_timer.timeout.connect(self._on_search_debounced)
 
         self._build_ui()
         self._connect_signals()
@@ -328,7 +333,7 @@ class MainWindow(QMainWindow):
         self._btn_create_repo.clicked.connect(self._on_create_repo)
         self._chk_favorites.toggled.connect(self._on_favorites_toggled)
         self._repo_type_combo.currentIndexChanged.connect(self._refresh_repos)
-        self._search_input.returnPressed.connect(self._refresh_repos)
+        self._search_input.textChanged.connect(lambda: self._search_timer.start())
         self._repo_tree.currentItemChanged.connect(self._on_repo_selected)
         self._repo_tree.customContextMenuRequested.connect(self._on_repo_context_menu)
         self._btn_delete_repo.clicked.connect(self._on_delete_repo)
@@ -459,7 +464,6 @@ class MainWindow(QMainWindow):
 
         repo_type = self._repo_type_combo.currentData() or "model"
         self._settings.set_last_repo_type(repo_type)
-        search = self._search_input.text().strip() or None
 
         def on_success(repos):
             self._all_repos = list(repos)
@@ -467,7 +471,7 @@ class MainWindow(QMainWindow):
 
         self._run_api(
             list_my_repos,
-            kwargs={"repo_type": repo_type, "author": self._user.username, "search": search},
+            kwargs={"repo_type": repo_type, "author": self._user.username},
             on_success=on_success,
             status_msg=f"Loading {self._repo_type_combo.currentText().lower()}...",
             busy=False,
@@ -476,10 +480,13 @@ class MainWindow(QMainWindow):
     def _populate_repo_tree(self) -> None:
         self._repo_tree.clear()
         favs_only = self._chk_favorites.isChecked()
+        search_text = self._search_input.text().strip().lower()
         shown = 0
         for r in self._all_repos:
             is_fav = r.repo_id in self._favorites
             if favs_only and not is_fav:
+                continue
+            if search_text and search_text not in r.repo_id.lower():
                 continue
             item = QTreeWidgetItem([
                 "\u2605" if is_fav else "",
@@ -493,10 +500,13 @@ class MainWindow(QMainWindow):
             self._repo_tree.addTopLevelItem(item)
             shown += 1
         total = len(self._all_repos)
-        if favs_only:
-            self._status.showMessage(f"Showing {shown} favorite(s) of {total} repos.", 3000)
+        if search_text or favs_only:
+            self._status.showMessage(f"Showing {shown} of {total} repos.", 3000)
         else:
             self._status.showMessage(f"Found {total} repo(s).", 3000)
+
+    def _on_search_debounced(self) -> None:
+        self._populate_repo_tree()
 
     def _on_favorites_toggled(self, checked: bool) -> None:
         self._settings.set_favorites_only(checked)
