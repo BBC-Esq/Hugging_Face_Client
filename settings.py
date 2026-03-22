@@ -65,3 +65,15 @@ class AppSettings:
 
     def set_favorites_only(self, val: bool) -> None:
         self._qs.setValue("favorites_only", val)
+
+    def get_repo_sort_column(self) -> int:
+        return self._qs.value("repo_sort_column", 1, int)
+
+    def set_repo_sort_column(self, column: int) -> None:
+        self._qs.setValue("repo_sort_column", column)
+
+    def get_repo_sort_order(self) -> int:
+        return self._qs.value("repo_sort_order", 0, int)
+
+    def set_repo_sort_order(self, order: int) -> None:
+        self._qs.setValue("repo_sort_order", order)

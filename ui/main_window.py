@@ -336,6 +336,7 @@ class MainWindow(QMainWindow):
         self._search_input.textChanged.connect(lambda: self._search_timer.start())
         self._repo_tree.currentItemChanged.connect(self._on_repo_selected)
         self._repo_tree.customContextMenuRequested.connect(self._on_repo_context_menu)
+        self._repo_tree.header().sortIndicatorChanged.connect(self._on_sort_changed)
         self._btn_delete_repo.clicked.connect(self._on_delete_repo)
         self._btn_toggle_vis.clicked.connect(self._on_toggle_visibility)
         self._btn_open_hub.clicked.connect(self._on_open_hub)
@@ -384,6 +385,10 @@ class MainWindow(QMainWindow):
 
         self._favorites = self._settings.get_favorite_repos()
         self._chk_favorites.setChecked(self._settings.get_favorites_only())
+
+        sort_col = self._settings.get_repo_sort_column()
+        sort_order = Qt.SortOrder(self._settings.get_repo_sort_order())
+        self._repo_tree.sortByColumn(sort_col, sort_order)
 
     def closeEvent(self, event) -> None:
         for worker in list(self._workers):
@@ -511,6 +516,10 @@ class MainWindow(QMainWindow):
     def _on_favorites_toggled(self, checked: bool) -> None:
         self._settings.set_favorites_only(checked)
         self._populate_repo_tree()
+
+    def _on_sort_changed(self, column: int, order: Qt.SortOrder) -> None:
+        self._settings.set_repo_sort_column(column)
+        self._settings.set_repo_sort_order(int(order))
 
     def _on_repo_context_menu(self, pos) -> None:
         item = self._repo_tree.itemAt(pos)
