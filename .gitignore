@@ -13,5 +13,11 @@ logs/
 # Local model card templates
 model_cards/
 
+# Installer
+installer/
+installer-output/
+tools/
+create_windows_installer_guide.txt
+
 # Misc
 .lock
