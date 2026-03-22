@@ -28,7 +28,15 @@ A PySide6 desktop application for managing your Hugging Face Hub account — rep
 
 ---
 
-## 🚀 Installation
+## 📥 Windows Installer
+
+[**Download HFHubManager_Setup.exe**](https://github.com/BBC-Esq/Hugging_Face_Client/releases/latest/download/HFHubManager_Setup.exe) from the latest release.
+
+The installer bundles an embedded Python environment and sets up all dependencies automatically — no Python installation required.
+
+---
+
+## 🚀 Installation (from source)
 
 ```bash
 pip install PySide6 huggingface_hub
