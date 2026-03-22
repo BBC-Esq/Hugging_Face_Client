@@ -54,25 +54,6 @@ python main.py
 
 ---
 
-## ⌨️ Keyboard Shortcuts & Interactions
-
-| Action | What it does |
-|---|---|
-| **Double-click** a repo | Open it on Hugging Face Hub in your browser |
-| **Double-click** a text file | Open it in the built-in editor |
-| **Drag files** onto file tree | Upload files to the targeted folder with confirmation |
-| **Right-click** a file | Context menu: edit, download, delete (multi-select for batch delete) |
-| **Right-click** a repo | Add/remove from favorites |
-| **Right-click** a collection | Add item, open in browser, or delete |
-| **Right-click** a collection item | Remove it from the collection |
-| **Click a column header** | Sort repos by name, visibility, downloads, likes, or modified date |
-| **Type** in the search box | Live-filter repos as you type |
-
-> [!IMPORTANT]
-> All destructive actions (delete repo, delete files, delete collection) require confirmation.
-
----
-
 ## 📌 Notes
 
 - Built on the [`huggingface_hub`](https://github.com/huggingface/huggingface_hub) Python library — all operations go through the official HF API
