@@ -519,7 +519,7 @@ class MainWindow(QMainWindow):
 
     def _on_sort_changed(self, column: int, order: Qt.SortOrder) -> None:
         self._settings.set_repo_sort_column(column)
-        self._settings.set_repo_sort_order(int(order))
+        self._settings.set_repo_sort_order(order.value)
 
     def _on_repo_context_menu(self, pos) -> None:
         item = self._repo_tree.itemAt(pos)
