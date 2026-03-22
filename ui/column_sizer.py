@@ -83,7 +83,10 @@ class ProportionalColumnSizer(QObject):
             header.resizeSection(i, widths[i])
 
     def eventFilter(self, obj: QObject, event: QEvent) -> bool:
-        if obj is self._tree.viewport() and event.type() == QEvent.Resize:
-            if self._proportions:
-                self._apply_widths()
+        try:
+            if obj is self._tree.viewport() and event.type() == QEvent.Resize:
+                if self._proportions:
+                    self._apply_widths()
+        except RuntimeError:
+            pass
         return False
