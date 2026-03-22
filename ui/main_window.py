@@ -336,6 +336,7 @@ class MainWindow(QMainWindow):
         self._search_input.textChanged.connect(lambda: self._search_timer.start())
         self._repo_tree.currentItemChanged.connect(self._on_repo_selected)
         self._repo_tree.customContextMenuRequested.connect(self._on_repo_context_menu)
+        self._repo_tree.itemDoubleClicked.connect(lambda: self._on_open_hub())
         self._repo_tree.header().sortIndicatorChanged.connect(self._on_sort_changed)
         self._btn_delete_repo.clicked.connect(self._on_delete_repo)
         self._btn_toggle_vis.clicked.connect(self._on_toggle_visibility)
