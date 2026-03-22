@@ -37,10 +37,13 @@ class LoginDialog(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        layout.addWidget(QLabel(
-            "Enter your Hugging Face access token.\n"
-            "Get one at: https://huggingface.co/settings/tokens"
-        ))
+        info_label = QLabel(
+            'Enter your Hugging Face access token.<br>'
+            'Get one at: <a href="https://huggingface.co/settings/tokens">'
+            'huggingface.co/settings/tokens</a>'
+        )
+        info_label.setOpenExternalLinks(True)
+        layout.addWidget(info_label)
 
         form = QFormLayout()
         self._token_input = QLineEdit()
