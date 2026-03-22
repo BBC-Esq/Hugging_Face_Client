@@ -21,3 +21,4 @@ create_windows_installer_guide.txt
 
 # Misc
 .lock
+*.exe

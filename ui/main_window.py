@@ -28,6 +28,13 @@ from PySide6.QtWidgets import (
 )
 
 from settings import AppSettings
+from ui.styles import (
+    ICON_BUTTON_STYLE,
+    ACTION_BUTTON_STYLE,
+    PRIMARY_BUTTON_STYLE,
+    DANGER_BUTTON_STYLE,
+    TOOLBAR_BUTTON_STYLE,
+)
 from ui.repo_browser import RepoBrowser
 from ui.collection_manager import CollectionManager
 from ui.workers import ApiWorker
@@ -177,7 +184,9 @@ class MainWindow(QMainWindow):
 
         self._user_label = QLabel("Not logged in")
         self._btn_login = QPushButton("Login")
+        self._btn_login.setStyleSheet(PRIMARY_BUTTON_STYLE)
         self._btn_logout = QPushButton("Logout")
+        self._btn_logout.setStyleSheet(ACTION_BUTTON_STYLE)
         self._btn_logout.setEnabled(False)
         auth_layout.addWidget(self._user_label, 1)
         auth_layout.addWidget(self._btn_login)
@@ -207,12 +216,12 @@ class MainWindow(QMainWindow):
 
         self._btn_refresh_repos = QPushButton("⟳")
         self._btn_refresh_repos.setToolTip("Refresh repo list")
-        self._btn_refresh_repos.setMaximumWidth(36)
+        self._btn_refresh_repos.setStyleSheet(ICON_BUTTON_STYLE)
         repo_toolbar.addWidget(self._btn_refresh_repos)
 
         self._btn_create_repo = QPushButton("+")
         self._btn_create_repo.setToolTip("Create new repo")
-        self._btn_create_repo.setMaximumWidth(36)
+        self._btn_create_repo.setStyleSheet(ICON_BUTTON_STYLE)
         repo_toolbar.addWidget(self._btn_create_repo)
 
         self._chk_favorites = QCheckBox("\u2605 Favorites only")
@@ -241,9 +250,12 @@ class MainWindow(QMainWindow):
         left_layout.addWidget(self._repo_tree, 1)
 
         repo_actions = QHBoxLayout()
-        self._btn_delete_repo = QPushButton("Delete Repo")
-        self._btn_toggle_vis = QPushButton("Toggle Visibility")
-        self._btn_open_hub = QPushButton("Open on Hub")
+        self._btn_delete_repo = QPushButton("🗑  Delete Repo")
+        self._btn_delete_repo.setStyleSheet(DANGER_BUTTON_STYLE)
+        self._btn_toggle_vis = QPushButton("🔒  Toggle Visibility")
+        self._btn_toggle_vis.setStyleSheet(ACTION_BUTTON_STYLE)
+        self._btn_open_hub = QPushButton("🌐  Open on Hub")
+        self._btn_open_hub.setStyleSheet(ACTION_BUTTON_STYLE)
         repo_actions.addWidget(self._btn_delete_repo)
         repo_actions.addWidget(self._btn_toggle_vis)
         repo_actions.addWidget(self._btn_open_hub)
@@ -271,9 +283,12 @@ class MainWindow(QMainWindow):
         readme_widget.setLayout(readme_layout)
 
         readme_btns = QHBoxLayout()
-        self._btn_load_readme = QPushButton("Load README")
-        self._btn_edit_readme = QPushButton("Edit README…")
-        self._btn_new_model_card = QPushButton("New Model Card…")
+        self._btn_load_readme = QPushButton("📄  Load README")
+        self._btn_load_readme.setStyleSheet(TOOLBAR_BUTTON_STYLE)
+        self._btn_edit_readme = QPushButton("✏️  Edit README…")
+        self._btn_edit_readme.setStyleSheet(TOOLBAR_BUTTON_STYLE)
+        self._btn_new_model_card = QPushButton("📝  New Model Card…")
+        self._btn_new_model_card.setStyleSheet(TOOLBAR_BUTTON_STYLE)
         readme_btns.addWidget(self._btn_load_readme)
         readme_btns.addWidget(self._btn_edit_readme)
         readme_btns.addWidget(self._btn_new_model_card)

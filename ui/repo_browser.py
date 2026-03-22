@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 from hf_backend.hf_repos import RepoFileEntry
+from ui.styles import TOOLBAR_BUTTON_STYLE, PRIMARY_BUTTON_STYLE
 
 _SIZE_ROLE = Qt.UserRole + 1
 _MAX_EDIT_BYTES = 10 * 1024 * 1024
@@ -57,8 +58,10 @@ class RepoBrowser(QWidget):
         toolbar.addWidget(QLabel("Branch:"))
         toolbar.addWidget(self._branch_combo)
 
-        self._btn_refresh = QPushButton("⟳ Refresh")
-        self._btn_upload = QPushButton("⬆ Upload")
+        self._btn_refresh = QPushButton("⟳  Refresh")
+        self._btn_refresh.setStyleSheet(TOOLBAR_BUTTON_STYLE)
+        self._btn_upload = QPushButton("⬆  Upload")
+        self._btn_upload.setStyleSheet(PRIMARY_BUTTON_STYLE)
         toolbar.addWidget(self._btn_refresh)
         toolbar.addWidget(self._btn_upload)
         toolbar.addStretch()
